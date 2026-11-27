@@ -1,0 +1,35 @@
+<!doctype html><html lang="uk"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Drag and Drop</title><style>
+body{margin:16px;font-family:Arial,sans-serif} #area{position:relative;height:70vh;overflow:hidden;border:1px solid #888} .item{position:absolute;width:80px;height:80px;touch-action:none;cursor:move;background:steelblue} #a{left:10px;top:30px} #b{left:105px;top:30px} #c{left:200px;top:30px} button{padding:8px;margin-bottom:10px}
+.item{opacity:.65} #a{border-radius:50%;background:rgb(240,70,70)} #b{background:rgb(60,130,245)} #c{background:rgb(60,190,100);clip-path:polygon(50% 0,100% 100%,0 100%)}body{background:#eef4f1;font-family:Arial,sans-serif} .item{cursor:grab} .item:active{cursor:grabbing} #area{border:2px dashed #9aada5;border-radius:12px;background:white}</style></head><body><h1>Переміщення об’єктів</h1><p>Перетягніть фігури мишкою.</p><div id="area"><div class="item" id="a"></div><div class="item" id="b"></div><div class="item" id="c"></div></div><script>
+const area = document.getElementById('area');
+const items = [...document.querySelectorAll('.item')];
+let moves = 0, z = 0;
+for (const item of items) {
+ let drag = null;
+ item.addEventListener('pointerdown', e => {
+  drag = {x:e.clientX-item.offsetLeft,y:e.clientY-item.offsetTop};
+  item.setPointerCapture(e.pointerId);
+  item.style.zIndex = ++z;
+ });
+ item.addEventListener('pointermove', e => {
+  if (!drag) return;
+  let x=e.clientX-drag.x, y=e.clientY-drag.y;
+  item.style.left=Math.max(0,Math.min(x,area.clientWidth-item.offsetWidth))+'px';
+  item.style.top=Math.max(0,Math.min(y,area.clientHeight-item.offsetHeight))+'px';
+ });
+ item.addEventListener('pointerup', () => {
+  if (!drag) return;
+  drag=null;
+  moves++;
+  const count=document.getElementById('count');
+  if(count) count.textContent='Переміщень: '+moves;
+ });
+ item.addEventListener('pointercancel',()=>{drag=null;});
+}
+const reset=document.getElementById('reset');
+if(reset) reset.addEventListener('click',()=>{
+ items.forEach(item=>{item.style.left='';item.style.top='';item.style.zIndex='';});
+ moves=0;z=0;
+ const count=document.getElementById('count');if(count) count.textContent='Переміщень: 0';
+});
+</script></body></html>
